@@ -27,3 +27,26 @@ th {
 tr:nth-child(even) {
   background-color: #fcfcfc;
 }
+.form-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #eaeaea;
+}
+
+input[type="text"], 
+input[type="number"], 
+input[type="date"] {
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #00B7FF;
+  box-shadow: 0 0 3px rgba(0, 183, 255, 0.5);
+}
