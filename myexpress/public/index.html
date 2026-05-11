@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泡麵通膨觀測站</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #d9534f;
+        }
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 150px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🍜 泡麵通膨觀測站</h1>
+
+    <div class="form-container">
+        <input type="date" id="date" required>
+        <input type="text" id="name" placeholder="商品名稱 (例：統一肉燥麵)" required>
+        <input type="number" id="price" placeholder="價格 (TWD)" required>
+        <button onclick="addPrice()">記錄物價</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>記錄日期</th>
+                <th>商品名稱</th>
+                <th>價格</th>
+            </tr>
+        </thead>
+        <tbody id="priceTableBody">
+            </tbody>
+    </table>
+
+    <script>
+        // 當網頁一載入，就立刻去跟後端要資料
+        window.onload = fetchPrices;
+
+        // 【GET】向後端 API 取得所有物價紀錄
+        async function fetchPrices() {
+            try {
+                const response = await fetch('/api/prices');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('priceTableBody');
+                tbody.innerHTML = ''; // 先清空表格
+                
+                // 把抓到的資料一筆一筆轉成 HTML 塞進表格
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.date}</td>
+                            <td>${item.name}</td>
+                            <td>$${item.price}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('抓取資料失敗:', error);
+            }
+        }
+
+        // 【POST】將新輸入的資料送到後端 API
+        async function addPrice() {
+            const date = document.getElementById('date').value;
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+
+            // 簡單的防呆檢查
+            if (!date || !name || !price) {
+                alert('請將日期、商品名稱與價格填寫完整！');
+                return;
+            }
+
+            try {
+                // 將資料打包成 JSON 送出
+                await fetch('/api/prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        date: date, 
+                        name: name, 
+                        price: parseInt(price) 
+                    })
+                });
+
+                // 新增成功後，清空輸入框，並重新抓取最新資料來更新表格
+                document.getElementById('name').value = '';
+                document.getElementById('price').value = '';
+                fetchPrices();
+                
+            } catch (error) {
+                console.error('新增資料失敗:', error);
+            }
+        }
+    </script>
+</body>
+</html>
