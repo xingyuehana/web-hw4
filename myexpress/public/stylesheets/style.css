@@ -6,3 +6,24 @@ body {
 a {
   color: #00B7FF;
 }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+tr:nth-child(even) {
+  background-color: #fcfcfc;
+}
